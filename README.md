@@ -13,7 +13,7 @@ It also supports the free DNS provider [desec.io](https://desec.io).
 		
 ## Volume structure
 
- - `/var/www` - web accessible resources in order tp allow letsencrypt verification
+ - `/var/www` - web accessible resources in order to allow letsencrypt verification
  - `/var/run/docker.sock` - used to restart the web container after a certificate renewal
  - `/certs` - the location where the certificates will be stored
 

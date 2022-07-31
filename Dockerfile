@@ -12,8 +12,9 @@ RUN apk add --no-cache \
         openssl-dev \
         dialog \
         bash \
-        cargo \
-        && pip install certbot
+        cargo
+
+RUN pip install certbot        
 
 RUN mkdir /certs
 RUN mkdir /dummyssl
