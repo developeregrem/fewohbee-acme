@@ -45,7 +45,6 @@ letsencryptcert(){
     	    `echo $domains` \
     	    --renew-by-default \
             --no-eff-email \
-    	    --quiet \
     	    --email "${EMAIL}"
     fi
 

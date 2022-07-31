@@ -15,6 +15,7 @@ It also supports the free DNS provider [desec.io](https://desec.io).
 
  - `/var/www` - web accessible resources in order tp allow letsencrypt verification
  - `/var/run/docker.sock` - used to restart the web container after a certificate renewal
+ - `/certs` - the location where the certificates will be stored
 
 ## Environment variables
 
