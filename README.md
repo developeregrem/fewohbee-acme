@@ -9,7 +9,7 @@ It also supports the free DNS provider [desec.io](https://desec.io).
  - `:latest` - always pull the latest image
 
 ## Supported architectures  
-`amd64`,  `arm32v7`, `arm64v8`
+`amd64`,  `arm64v8`
 		
 ## Volume structure
 
