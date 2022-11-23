@@ -1,23 +1,24 @@
 # docker-compose build
-FROM python:3.9-alpine
+FROM python:3.10-alpine
 
 RUN apk add --no-cache \
         curl \
         tzdata \
         jq \
-        gcc \
-        musl-dev \
-        libffi-dev \
         openssl \
-        openssl-dev \
         dialog \
-        bash \
-        cargo
+        bash       
 
-RUN pip install certbot        
+RUN apk add --no-cache --virtual .build-deps \
+        gcc \
+        libffi-dev \
+        musl-dev \
+        openssl-dev \
+        cargo \ 
+        && pip install --no-cache-dir certbot \
+        && apk del .build-deps    
 
-RUN mkdir /certs
-RUN mkdir /dummyssl
+RUN mkdir /certs && mkdir /dummyssl
 
 COPY ./run.sh /
 COPY ./updatecert /etc/periodic/daily/
