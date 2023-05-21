@@ -15,7 +15,7 @@ RUN apk add --no-cache --virtual .build-deps \
         musl-dev \
         openssl-dev \
         cargo \ 
-        && pip install --no-cache-dir certbot \
+        && pip install --no-cache-dir certbot certbot-dns-desec \
         && apk del .build-deps    
 
 RUN mkdir /certs && mkdir /dummyssl

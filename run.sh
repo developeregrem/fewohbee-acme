@@ -35,8 +35,13 @@ letsencryptcert(){
     if [ "${DYNDNS_PROVIDER}" = "desec.io" ]
     then
         dedynauth
-        certbot --manual --non-interactive --agree-tos --manual-public-ip-logging-ok --renew-by-default --email "${EMAIL}" --manual-auth-hook /hook.sh --manual-cleanup-hook /hook.sh \
-        --preferred-challenges dns `echo $domains` certonly 
+        certbot certonly \
+            --authenticator dns-desec \
+            --dns-desec-credentials /etc/letsencrypt/secrets/${DEDYN_NAME}.ini \
+            `echo $domains` \
+            --agree-tos \
+            --no-eff-email \
+            --email "${EMAIL}"
     else
         certbot certonly \
     	    --agree-tos \
@@ -48,21 +53,21 @@ letsencryptcert(){
     	    --email "${EMAIL}"
     fi
 
-        
-    cp /etc/letsencrypt/live/${HOST_NAME}/fullchain.pem /certs
-    cp /etc/letsencrypt/live/${HOST_NAME}/privkey.pem /certs
-    restart_containers
+    if [ -f "/etc/letsencrypt/live/${HOST_NAME}/fullchain.pem" ]
+        then
+        cp /etc/letsencrypt/live/${HOST_NAME}/fullchain.pem /certs
+        cp /etc/letsencrypt/live/${HOST_NAME}/privkey.pem /certs
+        restart_containers
+    fi
 }
 
 dedynauth() {
-    if [ "${DYNDNS_PROVIDER}" = "desec.io" ] && [ ! -f "/.dedynauth" ]
+    if [ "${DYNDNS_PROVIDER}" = "desec.io" ] && [ ! -d "/etc/letsencrypt/secrets/" ]
     then
-        echo "using desec provider and fetching hook script"
-        wget -O /hook.sh https://raw.githubusercontent.com/desec-io/certbot-hook/master/hook.sh
-        wget -O /.dedynauth https://raw.githubusercontent.com/desec-io/certbot-hook/master/.dedynauth
-        $(sed 's@^DEDYN_TOKEN=.*@DEDYN_TOKEN='"${DEDYN_TOKEN}"'@g' /.dedynauth > /.dedynauth.tmp && mv /.dedynauth.tmp /.dedynauth)
-        $(sed 's@^DEDYN_NAME=.*@DEDYN_NAME='"${DEDYN_NAME}"'@g' /.dedynauth > /.dedynauth.tmp && mv /.dedynauth.tmp /.dedynauth)
-        chmod +x /hook.sh
+        mkdir -p /etc/letsencrypt/secrets/
+        chmod 700 /etc/letsencrypt/secrets/
+        echo "dns_desec_token = ${DEDYN_TOKEN}" | tee /etc/letsencrypt/secrets/${DEDYN_NAME}.ini
+        chmod 600 /etc/letsencrypt/secrets/${DEDYN_NAME}.ini
     fi
 }
 
