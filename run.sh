@@ -3,18 +3,9 @@
 privkey=/certs/privkey.pem
 certfile=/certs/fullchain.pem
 
-restart_containers(){
-    containers=`curl -gGs --unix-socket /var/run/docker.sock http://${DOCKER_API_VERSION}/containers/json?all=true --data-urlencode 'filters={"label":{"com.docker.compose.service=web":true}}' | jq -r .[].Id`
-
-    for container in $containers; do
-        curl --unix-socket /var/run/docker.sock -X POST http:/${DOCKER_API_VERSION}/containers/$container/restart
-    done
-}
-
 selfsignedcert(){
-    cn="/CN=${HOST_NAME}"    
+    cn="/CN=${HOST_NAME}"
     openssl req -subj `echo $cn` -x509 -nodes -days 365 -newkey rsa:2048 -keyout $privkey -out $certfile
-    restart_containers
 }
 
 letsencryptcert(){
@@ -26,7 +17,7 @@ letsencryptcert(){
         domains="${domains} -d ${domain}"
     done
 
-    if [ "${domains}" = "" ] 
+    if [ "${domains}" = "" ]
     then
         echo "No domain specified in LETSENCRYPT_DOMAINS!"
         return 1
@@ -57,7 +48,6 @@ letsencryptcert(){
         then
         cp /etc/letsencrypt/live/${HOST_NAME}/fullchain.pem /certs
         cp /etc/letsencrypt/live/${HOST_NAME}/privkey.pem /certs
-        restart_containers
     fi
 }
 
@@ -86,8 +76,6 @@ fi
 if [ ! -f "$certfile" ]
 then
     cp /dummyssl/* /certs
-    
-    restart_containers
 	# generate dh params
 #	openssl dhparam -out /certs/dhparams.pem 4096
     $method
