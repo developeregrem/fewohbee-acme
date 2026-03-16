@@ -2,12 +2,9 @@
 FROM python:3.14-alpine
 
 RUN apk add --no-cache \
-        curl \
         tzdata \
-        jq \
         openssl \
-        dialog \
-        bash       
+        bash
 
 RUN apk add --no-cache --virtual .build-deps \
         gcc \
@@ -21,9 +18,10 @@ RUN apk add --no-cache --virtual .build-deps \
 RUN mkdir /certs && mkdir /dummyssl
 
 COPY ./run.sh /
+COPY ./acme-entrypoint.sh /
 COPY ./updatecert /etc/periodic/daily/
 COPY ./ssl-example/ /dummyssl/
 
-RUN chmod +x /run.sh && chmod 0744 /etc/periodic/daily/updatecert
+RUN chmod +x /run.sh /acme-entrypoint.sh && chmod 0744 /etc/periodic/daily/updatecert
 
-CMD [ "crond", "-f" ]
+CMD ["/acme-entrypoint.sh"]
